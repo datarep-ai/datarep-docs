@@ -2,7 +2,7 @@
 set -e
 
 # datarep installer
-# Usage: curl -sSL https://thyself-fyi.github.io/datarep-docs/install.sh | sh
+# Usage: curl -sSL https://datarep-ai.github.io/datarep-docs/install.sh | sh
 
 BOLD='\033[1m'
 GREEN='\033[0;32m'
@@ -67,5 +67,5 @@ echo "  3. Register your app:"
 echo "     ${BOLD}datarep app register <your-app-name>${NC}"
 echo ""
 echo "  4. Read the integration guide:"
-echo "     https://thyself-fyi.github.io/datarep-docs/integration-guide/"
+echo "     https://datarep-ai.github.io/datarep-docs/integration-guide/"
 echo ""

@@ -28,7 +28,7 @@ datarep replaces all of that with a single trusted runtime:
 === "curl"
 
     ```bash
-    curl -sSL https://thyself-fyi.github.io/datarep-docs/install.sh | sh
+    curl -sSL https://datarep-ai.github.io/datarep-docs/install.sh | sh
     ```
 
 ## Quick start

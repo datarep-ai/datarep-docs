@@ -1,7 +1,7 @@
 site_name: datarep
-site_url: https://thyself-fyi.github.io/datarep-docs/
+site_url: https://datarep-ai.github.io/datarep-docs/
 site_description: Delegated data retrieval for agentic apps
-repo_url: https://github.com/thyself-fyi/datarep
+repo_url: https://github.com/datarep-ai/datarep
 
 theme:
   name: material
@@ -52,4 +52,4 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/thyself-fyi
+      link: https://github.com/datarep-ai
