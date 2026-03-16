@@ -1,6 +1,6 @@
 # datarep Integration Guide
 
-datarep is your app's data rep — a local agent runtime that retrieves data from arbitrary sources on your behalf. Your app never writes retrieval code, handles credentials, or executes anything. It tells datarep what data it needs, and datarep figures out how to get it, writes the extraction code, validates it, and delivers the results.
+datarep is your app's data rep — a local agent runtime that retrieves data from arbitrary sources on your behalf. Your app never writes retrieval code, handles credentials, or executes anything. It tells datarep what data it needs, and datarep's agent figures out how to get it — conversationally discovering access methods, writing extraction code, validating results, and delivering structured data.
 
 This guide walks you through integrating datarep into your application, whether it's an agentic app like [thyself](https://github.com/jfru/thyself), a backend service, or a CLI tool.
 
@@ -12,14 +12,14 @@ This guide walks you through integrating datarep into your application, whether 
 ┌─────────────┐         ┌──────────────────────────────────────┐
 │  Your App   │  HTTP   │              datarep                 │
 │             │ ──────► │                                      │
-│  - thyself  │  or     │  1. Inspects the source              │
-│  - resman   │  MCP    │  2. Writes retrieval code            │
-│  - any app  │         │  3. Executes it in a sandbox         │
+│  - thyself  │  or     │  1. Asks user how they access data   │
+│  - resman   │  MCP    │  2. Explores the device              │
+│  - any app  │         │  3. Writes retrieval code            │
 │             │ ◄────── │  4. Returns data (or saves a recipe) │
 └─────────────┘         └──────────────────────────────────────┘
 ```
 
-Your app authenticates with an **API key**, tells datarep what source and what data it wants, and datarep handles everything else — including credential management, sandboxed code execution, and caching working code as "recipes" for instant replay.
+Your app authenticates with an **API key**, tells datarep what data it wants, and datarep handles everything else — including conversational discovery, browser cookie extraction, sandboxed code execution, and caching working code as "recipes" for instant replay.
 
 ---
 
@@ -75,15 +75,14 @@ Unauthenticated requests return `401`. Requests to sources outside your app's al
 
 ### 4a. Agent-driven retrieval (`POST /get`)
 
-This is the primary way to get data. You describe what you want in natural language; datarep's Claude agent figures out how to get it.
+This is the primary way to get data. You describe what you want in natural language; datarep's agent figures out how to get it. The `source` field is optional — the agent can discover sources on its own.
 
 ```bash
 curl -X POST http://127.0.0.1:7080/get \
   -H "Authorization: Bearer dr_<key>" \
   -H "Content-Type: application/json" \
   -d '{
-    "source": "imessage",
-    "query": "get all messages from the last 7 days"
+    "query": "get my Instagram DMs"
   }'
 ```
 
@@ -92,23 +91,46 @@ curl -X POST http://127.0.0.1:7080/get \
 ```json
 {
   "status": "success",
-  "result": "Retrieved 142 messages from the last 7 days. Data output as JSON lines..."
+  "result": "Retrieved 40 messages from 5 conversations..."
 }
 ```
 
-The agent inspects the source, writes Python code, executes it in a sandbox, and returns the result. On first use this takes 10-30 seconds. The agent automatically saves a **recipe** — a cached version of the working code — so subsequent requests for the same pattern are instant.
+**Response** (agent needs user input):
+
+```json
+{
+  "status": "question",
+  "session_id": "s_abc123def456",
+  "question": "How do you usually access your Instagram messages — in a browser, the app, or something else?"
+}
+```
+
+When the agent needs information from the user (like how they access their data), it returns a `question` response with a `session_id`. Your app should relay the question to the user and send their answer back.
+
+### 4b. Replying to agent questions (`POST /sessions/{id}/reply`)
+
+When the agent asks a question, continue the conversation by replying with the user's answer:
+
+```bash
+curl -X POST http://127.0.0.1:7080/sessions/s_abc123def456/reply \
+  -H "Authorization: Bearer dr_<key>" \
+  -H "Content-Type: application/json" \
+  -d '{"answer": "im logged in via Safari"}'
+```
+
+The response will be either another `question` (the conversation continues), a `success` (data retrieved), or an `error`.
 
 **What happens under the hood:**
 
-1. datarep checks if credentials are needed (returns `action_required` if so)
-2. The Claude agent inspects the source (schema, tables, API docs)
-3. It writes Python retrieval code
-4. The code runs in a sandboxed subprocess with network/filesystem restrictions
-5. If it fails, the agent reads the error and tries again (up to 50 turns)
-6. On success, it saves a recipe and updates sync state
+1. The agent checks for an existing recipe for this data type
+2. If no recipe exists, it asks the user how they access the data
+3. Based on the answer, it explores the device — scanning browser profiles, app databases, local files
+4. It extracts credentials programmatically (e.g., session cookies from Safari via `browser_cookie3`)
+5. It writes Python retrieval code and executes it in a sandboxed subprocess
+6. If it fails, it reads the error, adapts, and tries again
+7. On success, it validates data quality, saves a recipe with an access strategy, and returns the data
 
-
-### 4b. Incremental sync (`POST /sync`)
+### 4c. Incremental sync (`POST /sync`)
 
 Same as `/get`, but signals to the agent that it should pick up where the last sync left off (using saved cursors/timestamps):
 
@@ -125,7 +147,7 @@ curl -X POST http://127.0.0.1:7080/sync \
 The `query` field is optional — if omitted, datarep defaults to a full incremental sync.
 
 
-### 4c. Recipe replay (`POST /recipe/run`)
+### 4d. Recipe replay (`POST /recipe/run`)
 
 Once a recipe exists, you can replay it without any LLM call. This is the fast path — sub-second, deterministic, no API costs:
 
@@ -133,7 +155,7 @@ Once a recipe exists, you can replay it without any LLM call. This is the fast p
 curl -X POST http://127.0.0.1:7080/recipe/run \
   -H "Authorization: Bearer dr_<key>" \
   -H "Content-Type: application/json" \
-  -d '{"recipe_id": "imessage_messages_v1"}'
+  -d '{"recipe_id": "instagram_dms_v1"}'
 ```
 
 **Response:**
@@ -141,8 +163,8 @@ curl -X POST http://127.0.0.1:7080/recipe/run \
 ```json
 {
   "status": "success",
-  "stdout": "{\"id\": 1, \"text\": \"hey\", \"date\": \"2026-03-15\"}\n{\"id\": 2, \"text\": \"what's up\", \"date\": \"2026-03-15\"}\n",
-  "stderr": "Retrieved 2 messages\n"
+  "stdout": "{\"conversation_id\": \"123\", \"sender\": \"alice\", \"text\": \"hey\"}\n",
+  "stderr": "Retrieved 40 messages from 5 conversations\n"
 }
 ```
 
@@ -152,9 +174,76 @@ Recipe replay returns raw `stdout`/`stderr` from the Python script. Data is in J
 
 ---
 
-## 5. Managing sources
+## 5. Conversational flow
 
-Sources must be registered before retrieval. Your app can do this via the API:
+The agent uses a conversational model to discover how to access data. This is the key difference from traditional integration systems — instead of requiring pre-configured sources, the agent asks the user and figures it out.
+
+### For CLI apps
+
+The CLI handles the conversation loop automatically:
+
+```bash
+datarep get "i want my Instagram DMs"
+# Agent: "How do you usually access your Instagram messages — in a browser, the app, or something else?"
+# You: "im logged in in browser"
+# Agent: [extracts cookies, calls API, returns data]
+```
+
+### For HTTP API consumers
+
+Your app needs to handle the question/reply loop:
+
+```python
+import httpx
+
+DATAREP = "http://127.0.0.1:7080"
+HEADERS = {"Authorization": "Bearer dr_<key>"}
+
+async def get_data(query: str, source: str = None):
+    body = {"query": query}
+    if source:
+        body["source"] = source
+
+    result = (await httpx.AsyncClient().post(
+        f"{DATAREP}/get", json=body, headers=HEADERS, timeout=120,
+    )).json()
+
+    while result.get("status") == "question":
+        # Relay the question to your user and get their answer
+        answer = await ask_user(result["question"])
+        result = (await httpx.AsyncClient().post(
+            f"{DATAREP}/sessions/{result['session_id']}/reply",
+            json={"answer": answer},
+            headers=HEADERS,
+            timeout=120,
+        )).json()
+
+    return result
+```
+
+### For agentic apps
+
+If your app has an LLM agent, pass the `question` response directly to your agent as context. Your agent can have a natural conversation with the user and relay answers back to datarep:
+
+> **User:** "Import my Instagram DMs"
+>
+> **Your agent** calls datarep, gets a question back
+>
+> **Your agent:** "datarep wants to know — how do you usually access your Instagram? In a browser, the app, or something else?"
+>
+> **User:** "Safari"
+>
+> **Your agent** replies to the datarep session with "Safari"
+>
+> **datarep agent** extracts Safari cookies, calls API, returns data
+
+---
+
+## 6. Managing sources
+
+Sources are **optional** in the new architecture. The agent can discover and access data without any pre-registered sources. When it successfully retrieves data, it auto-registers a "discovered" source for recipe tracking.
+
+You can still pre-register sources if you want:
 
 ### Register a source
 
@@ -199,11 +288,12 @@ curl -X POST http://127.0.0.1:7080/sources \
 
 ### Source types
 
-| Type | Config | Sandbox behavior |
-|------|--------|-----------------|
-| `local_db` | `path`: path to SQLite file | No network access. Read-only filesystem access to the DB path. |
-| `rest_api` | `base_url`, plus optional OAuth fields | Network restricted to `base_url` domain and `token_url` domain only. |
-| `local_files` | `path`: directory path | No network access. Read-only access to the directory. |
+| Type | Config | When to use |
+|------|--------|-------------|
+| `local_db` | `path`: path to SQLite file | You know the exact DB path upfront |
+| `rest_api` | `base_url`, plus optional OAuth fields | You want to pre-configure OAuth credentials |
+| `local_files` | `path`: directory path | You want to restrict the agent to a specific directory |
+| `discovered` | Auto-created by agent | Agent found the data without a pre-registered source |
 
 ### List sources
 
@@ -221,11 +311,9 @@ curl -X DELETE http://127.0.0.1:7080/sources/imessage \
 
 ---
 
-## 6. Handling credentials
+## 7. Handling credentials
 
-For `local_db` and `local_files` sources, no credentials are needed (the agent accesses the filesystem directly).
-
-For `rest_api` sources, you have two options:
+The agent can often extract credentials on its own — particularly browser session cookies. For sources where this isn't possible, you have two options:
 
 ### Store an API key
 
@@ -255,7 +343,7 @@ This opens the user's browser to the provider's consent screen, runs a local red
 
 ---
 
-## 7. Handling `action_required` responses
+## 8. Handling `action_required` responses
 
 When datarep needs something from the user — a permission grant, an OAuth login, a missing API key — it returns a structured `action_required` response instead of failing silently. **Your app is responsible for relaying this to the user.**
 
@@ -287,7 +375,7 @@ When datarep needs something from the user — a permission grant, an OAuth logi
 
 ### For agentic apps
 
-If your app has an LLM agent (like thyself), pass the full `action_required` response to your agent as context. The fields are designed to be LLM-friendly — your agent can read `explanation`, `steps`, and `context` and have a natural conversation with the user about what's needed:
+If your app has an LLM agent, pass the full `action_required` response to your agent as context. The fields are designed to be LLM-friendly — your agent can read `explanation`, `steps`, and `context` and have a natural conversation with the user about what's needed:
 
 > **User:** "Import my iMessages"
 >
@@ -297,9 +385,9 @@ After the user completes the action, retry the original request. All `action_req
 
 ---
 
-## 8. Recipes
+## 9. Recipes
 
-Recipes are datarep's caching layer. When the agent successfully retrieves data, it saves the working Python code as a recipe. Recipes can be replayed instantly without an LLM call.
+Recipes are datarep's caching layer. When the agent successfully retrieves data, it saves the working Python code as a recipe along with an **access strategy** that describes how the data is accessed (e.g., "Safari cookies + Instagram web API"). Recipes can be replayed instantly without an LLM call.
 
 ### List recipes
 
@@ -308,7 +396,7 @@ curl http://127.0.0.1:7080/recipes \
   -H "Authorization: Bearer dr_<key>"
 
 # Filter by source
-curl "http://127.0.0.1:7080/recipes?source=imessage" \
+curl "http://127.0.0.1:7080/recipes?source=instagram" \
   -H "Authorization: Bearer dr_<key>"
 ```
 
@@ -318,12 +406,13 @@ curl "http://127.0.0.1:7080/recipes?source=imessage" \
 {
   "recipes": [
     {
-      "id": "imessage_messages_v1",
-      "source_name": "imessage",
-      "description": "Retrieves all iMessage conversations",
-      "last_used_at": "2026-03-15T10:00:00+00:00",
-      "times_used": 12,
-      "created_at": "2026-03-14T08:30:00+00:00"
+      "id": "instagram_dms_v1",
+      "source_name": "instagram",
+      "description": "Retrieves Instagram DMs via browser cookies and web API",
+      "access_strategy": "Extract Safari session cookies, call Instagram private API with rate limiting",
+      "last_used_at": "2026-03-16T15:34:00+00:00",
+      "times_used": 3,
+      "created_at": "2026-03-16T15:22:00+00:00"
     }
   ]
 }
@@ -332,9 +421,13 @@ curl "http://127.0.0.1:7080/recipes?source=imessage" \
 ### Get recipe details (including code)
 
 ```bash
-curl http://127.0.0.1:7080/recipes/imessage_messages_v1 \
+curl http://127.0.0.1:7080/recipes/instagram_dms_v1 \
   -H "Authorization: Bearer dr_<key>"
 ```
+
+### Recipe portability
+
+Recipes capture a specific access strategy that worked on a specific device. They may not be universally portable — a recipe that extracts Safari cookies won't work on a machine where the user uses Chrome. The agent handles this gracefully: if a recipe fails, it diagnoses the issue and adapts rather than rewriting from scratch.
 
 ### Recommended integration pattern
 
@@ -344,10 +437,11 @@ import httpx
 DATAREP = "http://127.0.0.1:7080"
 HEADERS = {"Authorization": "Bearer dr_<key>"}
 
-async def get_data(source: str, query: str):
+async def get_data(query: str, source: str = None):
     # 1. Check for an existing recipe
+    params = {"source": source} if source else {}
     resp = await httpx.AsyncClient().get(
-        f"{DATAREP}/recipes", params={"source": source}, headers=HEADERS
+        f"{DATAREP}/recipes", params=params, headers=HEADERS
     )
     recipes = resp.json().get("recipes", [])
 
@@ -364,18 +458,30 @@ async def get_data(source: str, query: str):
             return data["stdout"]
 
     # 3. Slow path: agent-driven retrieval (creates a recipe for next time)
-    result = await httpx.AsyncClient().post(
-        f"{DATAREP}/get",
-        json={"source": source, "query": query},
-        headers=HEADERS,
-        timeout=120,
-    )
-    return result.json()
+    body = {"query": query}
+    if source:
+        body["source"] = source
+
+    result = (await httpx.AsyncClient().post(
+        f"{DATAREP}/get", json=body, headers=HEADERS, timeout=120,
+    )).json()
+
+    # 4. Handle conversational flow
+    while result.get("status") == "question":
+        answer = await ask_user(result["question"])
+        result = (await httpx.AsyncClient().post(
+            f"{DATAREP}/sessions/{result['session_id']}/reply",
+            json={"answer": answer},
+            headers=HEADERS,
+            timeout=120,
+        )).json()
+
+    return result
 ```
 
 ---
 
-## 9. MCP interface (for agentic apps)
+## 10. MCP interface (for agentic apps)
 
 If your app uses the Model Context Protocol, datarep exposes itself as an MCP server. This is the most natural integration for LLM-powered apps — your agent discovers datarep's tools and uses them directly.
 
@@ -402,7 +508,8 @@ Add datarep to your MCP config (e.g., in Cursor, Claude Desktop, or your app's M
 
 | Tool | Description |
 |------|-------------|
-| `datarep_get(source, query)` | Agent-driven retrieval |
+| `datarep_get(query, source?)` | Agent-driven retrieval. Source is optional. May return a question. |
+| `datarep_reply(session_id, answer)` | Reply to an agent question to continue a retrieval session. |
 | `datarep_sync(source, query?)` | Incremental sync |
 | `datarep_list_sources()` | List registered sources |
 | `datarep_run_recipe(recipe_id)` | Replay a saved recipe |
@@ -421,14 +528,15 @@ The MCP interface does not use API key auth (it runs as a local subprocess, so t
 
 ---
 
-## 10. Complete API reference
+## 11. Complete API reference
 
 ### Endpoints
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | `GET` | `/health` | No | Health check. Returns `{"status": "ok"}`. |
-| `POST` | `/get` | Bearer | Agent-driven data retrieval. |
+| `POST` | `/get` | Bearer | Agent-driven data retrieval. `source` is optional. |
+| `POST` | `/sessions/{id}/reply` | Bearer | Reply to an agent question, continuing the session. |
 | `POST` | `/sync` | Bearer | Incremental sync. |
 | `POST` | `/recipe/run` | Bearer | Replay a saved recipe. |
 | `GET` | `/sources` | Bearer | List sources (filtered to your app's allow-list). |
@@ -444,7 +552,12 @@ The MCP interface does not use API key auth (it runs as a local subprocess, so t
 
 **`POST /get`**
 ```json
-{"source": "string", "query": "string"}
+{"query": "string", "source": "string (optional)", "stream": false}
+```
+
+**`POST /sessions/{id}/reply`**
+```json
+{"answer": "string", "stream": false}
 ```
 
 **`POST /sync`**
@@ -474,10 +587,21 @@ The MCP interface does not use API key auth (it runs as a local subprocess, so t
 
 ### Response shapes
 
-All responses return JSON. Successful responses vary by endpoint (see examples above). Errors follow this pattern:
+All responses return JSON. The three primary response types are:
 
+**Success:**
 ```json
-{"detail": "Error description"}
+{"status": "success", "result": "..."}
+```
+
+**Question (agent needs user input):**
+```json
+{"status": "question", "session_id": "s_abc123", "question": "How do you...?"}
+```
+
+**Error:**
+```json
+{"status": "error", "error": "...", "traceback": "..."}
 ```
 
 ### HTTP status codes
@@ -493,7 +617,20 @@ All responses return JSON. Successful responses vary by endpoint (see examples a
 
 ---
 
-## 11. Configuration
+## 12. Sandbox model
+
+The agent's code runs in a macOS `sandbox-exec` environment with:
+
+- **Full read-only filesystem access** — the agent can read any file on the device (browser profiles, app databases, local files)
+- **Open network access** — outbound TCP and UDP (including DNS resolution)
+- **Write-restricted** — writes only allowed to the temporary working directory
+- **No inbound connections** — the sandbox cannot listen for incoming traffic
+
+The sandbox is designed for trust: the user runs datarep on their own machine and controls what data gets retrieved. The agent is instructed to never ask the user to manually extract data it can get programmatically.
+
+---
+
+## 13. Configuration
 
 datarep is configured via environment variables:
 
@@ -514,21 +651,23 @@ datarep is configured via environment variables:
 | `datarep.db` | SQLite database (sources, credentials, recipes, apps, audit log) |
 | `master.key` | Fernet encryption key for credentials (mode `0600`) |
 | `recipes/` | Saved recipe `.py` files |
+| `logs/` | Per-request agent JSONL log files |
 | `datarep.pid` | Server PID when running as daemon |
 
 ---
 
-## 12. Security model
+## 14. Security model
 
 - **Credentials are encrypted at rest** using Fernet symmetric encryption. The master key is stored with `0600` permissions.
 - **API keys are bcrypt-hashed** — datarep never stores your app's key in plaintext.
-- **Code execution is sandboxed** — on macOS, datarep uses `sandbox-exec` to restrict network access (only the source's registered domains) and filesystem access (read-only to the source path, read-write to a temp working directory).
+- **Code execution is sandboxed** — on macOS, datarep uses `sandbox-exec` to restrict filesystem writes and enforce read-only access to the rest of the system.
 - **Per-app source restrictions** — each app can be limited to specific sources at registration time.
 - **Full audit log** — every action (retrieval, sync, source changes, auth events) is logged with app ID, timestamp, and status.
+- **Agent never delegates to user** — the agent extracts credentials programmatically rather than asking users to paste tokens or cookies.
 
 ---
 
-## 13. Checking the audit log
+## 15. Checking the audit log
 
 For debugging or monitoring, query the audit log:
 
@@ -549,7 +688,6 @@ Each entry includes: timestamp, app ID, action, source, status, and optional det
 2. [ ] Set `ANTHROPIC_API_KEY` in the environment
 3. [ ] `datarep start`
 4. [ ] `datarep app register <your-app>` — save the API key
-5. [ ] Register sources (`POST /sources` or `datarep source add`)
-6. [ ] Store credentials if needed (`POST /auth/credentials` or `POST /auth/oauth`)
-7. [ ] Call `POST /get` with your query — datarep handles the rest
-8. [ ] On subsequent calls, use `POST /recipe/run` for instant replay
+5. [ ] Call `POST /get` with your query — datarep handles the rest
+6. [ ] Handle `question` responses by relaying to the user and replying with `POST /sessions/{id}/reply`
+7. [ ] On subsequent calls, use `POST /recipe/run` for instant replay

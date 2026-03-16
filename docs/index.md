@@ -4,9 +4,9 @@
 
 A **rep** is someone you send to go get something on your behalf. You don't tell them how — you tell them what you need, and they figure it out. They show up, assess the situation, adapt to whatever they find, and come back with the goods.
 
-That's what datarep does. Your app says "get me the user's recent iMessages" and datarep handles it — explores the database schema, identifies the data formats, picks the right parsing libraries, writes the extraction code, tests it, and delivers the data. No one wrote an iMessage integration. The rep wrote one at runtime.
+That's what datarep does. Your app says "get me the user's Instagram DMs" and datarep handles it — asks the user how they access the data, extracts session cookies from their browser, calls the API, parses the response, and delivers structured data. No one wrote an Instagram integration. The rep figured one out at runtime.
 
-And like a good rep, it learns. Working code is saved as **recipes** so next time it doesn't have to figure it out again. First request takes seconds. Every request after that is instant.
+And like a good rep, it learns. Working code is saved as **recipes** with a full access strategy, so next time it doesn't have to figure it out again. First request takes seconds. Every request after that is instant.
 
 ---
 
@@ -18,9 +18,9 @@ There isn't really a category for this yet. It's not a connector (those are pre-
 
 datarep replaces bespoke integration code with a single trusted runtime:
 
-- **Your app never writes retrieval code.** It sends a natural-language query. datarep's agent inspects the source, writes Python code, and executes it in a sandbox.
-- **Your app never handles credentials.** datarep manages encrypted storage, browser-based OAuth, and automatic token refresh.
-- **Your app never executes untrusted code.** All code runs inside datarep's sandbox with network and filesystem restrictions.
+- **Your app never writes retrieval code.** It sends a natural-language query. datarep's agent discovers how to access the data and writes the extraction code at runtime.
+- **Your app never handles credentials.** datarep extracts session cookies from the user's browsers, manages encrypted storage, handles OAuth, and refreshes tokens automatically.
+- **Your app never executes untrusted code.** All code runs inside datarep's sandbox with filesystem and network restrictions.
 - **Users grant trust once** — to datarep — instead of to every app that wants their data.
 
 ## Install
@@ -61,10 +61,10 @@ Then retrieve data:
 curl -X POST http://127.0.0.1:7080/get \
   -H "Authorization: Bearer dr_<your-api-key>" \
   -H "Content-Type: application/json" \
-  -d '{"source": "my_source", "query": "get recent records"}'
+  -d '{"query": "get my recent iMessages"}'
 ```
 
-datarep inspects the source, writes retrieval code, executes it, returns data, and saves a **recipe** — a cached version of the working code — so subsequent requests are instant.
+datarep's agent asks the user how they access the data, explores the device, writes retrieval code, executes it, returns data, and saves a **recipe** — a cached version of the working code — so subsequent requests are instant.
 
 ## How it works
 
@@ -73,34 +73,31 @@ sequenceDiagram
     participant App as Your App
     participant DR as datarep
     participant Agent as Claude Agent
+    participant User as User
     participant Sandbox as Sandbox
 
-    App->>DR: POST /get {source, query}
-    DR->>Agent: Inspect source, write code
-    Agent->>Sandbox: Execute Python in sandbox
+    App->>DR: POST /get {query}
+    DR->>Agent: Start retrieval
+    Agent->>User: "How do you access this data?"
+    User-->>Agent: "I'm logged in via Safari"
+    Agent->>Sandbox: Extract browser cookies
+    Sandbox-->>Agent: Session cookies found
+    Agent->>Sandbox: Call API with cookies
     Sandbox-->>Agent: stdout (JSON lines)
-    Agent->>DR: Save recipe, update sync state
+    Agent->>DR: Save recipe + access strategy
     DR-->>App: {status: "success", result: "..."}
 
-    Note over App,DR: Next time: POST /recipe/run — instant, no LLM call
+    Note over App,DR: Next time: recipe replay — instant, no LLM call
 ```
 
 ## Interfaces
 
 | Interface | Use case |
 |-----------|----------|
-| **HTTP API** (`localhost:7080`) | Primary interface for all apps. Bearer token auth. |
+| **HTTP API** (`localhost:7080`) | Primary interface for all apps. Bearer token auth. Supports conversational sessions. |
 | **MCP server** | Native protocol for LLM-powered / agentic apps. |
-| **CLI** (`datarep`) | Setup, source management, debugging. |
-
-## Source types
-
-| Type | Example | Sandbox restrictions |
-|------|---------|---------------------|
-| `local_db` | iMessage, WhatsApp, any SQLite | No network. Read-only DB access. |
-| `rest_api` | Square, Gmail, Quickbooks | Network restricted to source domain only. |
-| `local_files` | Photos, documents, exports | No network. Read-only directory access. |
+| **CLI** (`datarep`) | Interactive retrieval, setup, source management, debugging. |
 
 ## Next steps
 
-Read the **[Integration Guide](integration-guide.md)** for the full walkthrough: API reference, authentication, handling permissions, MCP setup, recipes, and code examples.
+Read the **[Integration Guide](integration-guide.md)** for the full walkthrough: API reference, conversational sessions, authentication, MCP setup, recipes, and code examples.
