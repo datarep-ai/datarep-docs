@@ -390,7 +390,8 @@ Add datarep to your MCP config (e.g., in Cursor, Claude Desktop, or your app's M
       "command": "python",
       "args": ["-m", "datarep.mcp_server"],
       "env": {
-        "ANTHROPIC_API_KEY": "<key>"
+        "ANTHROPIC_API_KEY": "<key-or-jwt>",
+        "ANTHROPIC_BASE_URL": "https://your-proxy.example.com"
       }
     }
   }
@@ -501,7 +502,8 @@ datarep is configured via environment variables:
 | `DATAREP_HOME` | Data directory | `~/.datarep` |
 | `DATAREP_PORT` | HTTP server port | `7080` |
 | `DATAREP_HOST` | Server bind address | `127.0.0.1` |
-| `ANTHROPIC_API_KEY` | Powers the retrieval agent | Required for `/get` and `/sync` |
+| `ANTHROPIC_API_KEY` | Powers the retrieval agent (or JWT when proxied) | Required for `/get` and `/sync` |
+| `ANTHROPIC_BASE_URL` | Custom base URL for Anthropic API (proxy support) | `https://api.anthropic.com` |
 | `DATAREP_MODEL` | Claude model to use | `claude-sonnet-4-20250514` |
 | `DATAREP_KEY` | Fernet key for credential encryption | Auto-generated |
 
