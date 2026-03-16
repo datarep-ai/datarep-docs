@@ -1,6 +1,6 @@
 # datarep Integration Guide
 
-datarep is a trusted local service that retrieves data from arbitrary sources on behalf of your application. Your app never writes retrieval code, handles credentials, or executes anything — it just asks datarep for data and gets it back.
+datarep is your app's data rep — a local agent runtime that retrieves data from arbitrary sources on your behalf. Your app never writes retrieval code, handles credentials, or executes anything. It tells datarep what data it needs, and datarep figures out how to get it, writes the extraction code, validates it, and delivers the results.
 
 This guide walks you through integrating datarep into your application, whether it's an agentic app like [thyself](https://github.com/jfru/thyself), a backend service, or a CLI tool.
 

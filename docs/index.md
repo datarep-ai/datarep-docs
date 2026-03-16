@@ -1,16 +1,22 @@
 # datarep
 
-**Delegated data retrieval for agentic apps.**
+**Your app's data rep.**
 
-datarep is a trusted local service that retrieves data from arbitrary sources on behalf of your application. Your app describes what data it wants — datarep figures out how to get it.
+A **rep** is someone you send to go get something on your behalf. You don't tell them how — you tell them what you need, and they figure it out. They show up, assess the situation, adapt to whatever they find, and come back with the goods.
+
+That's what datarep does. Your app says "get me the user's recent iMessages" and datarep handles it — explores the database schema, identifies the data formats, picks the right parsing libraries, writes the extraction code, tests it, and delivers the data. No one wrote an iMessage integration. The rep wrote one at runtime.
+
+And like a good rep, it learns. Working code is saved as **recipes** so next time it doesn't have to figure it out again. First request takes seconds. Every request after that is instant.
 
 ---
 
 ## Why datarep?
 
-Every app that needs user data ends up building its own integrations — its own OAuth flows, its own credential storage, its own API wrappers. They break. They drift. They each need their own security review.
+Every app that needs user data today has to build and maintain its own integrations — or depend on a cloud service that proxies the user's data through someone else's servers. datarep is a different approach: a local agent runtime that synthesizes integrations on demand, runs on the user's machine, and never sends their data anywhere.
 
-datarep replaces all of that with a single trusted runtime:
+There isn't really a category for this yet. It's not a connector (those are pre-built by humans), not an ETL pipeline, not an SDK. It's an autonomous agent that *becomes* a connector — for any source, on the fly.
+
+datarep replaces bespoke integration code with a single trusted runtime:
 
 - **Your app never writes retrieval code.** It sends a natural-language query. datarep's agent inspects the source, writes Python code, and executes it in a sandbox.
 - **Your app never handles credentials.** datarep manages encrypted storage, browser-based OAuth, and automatic token refresh.
