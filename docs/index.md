@@ -80,14 +80,20 @@ sequenceDiagram
     DR->>Agent: Start retrieval
     Agent->>User: "How do you access this data?"
     User-->>Agent: "I'm logged in via Safari"
-    Agent->>Sandbox: Extract browser cookies
-    Sandbox-->>Agent: Session cookies found
-    Agent->>Sandbox: Call API with cookies
-    Sandbox-->>Agent: stdout (JSON lines)
-    Agent->>DR: Save recipe + access strategy
-    DR-->>App: {status: "success", result: "..."}
+    Agent->>Sandbox: Explore source, run stats
+    Sandbox-->>Agent: 12,420 records found
+    Agent->>User: "Found 12,420 records. Proceed?"
+    User-->>Agent: "Yes"
+    Agent->>Sandbox: Test extraction (~1000 rows)
+    Sandbox-->>Agent: Quality validated
+    Agent->>DR: Save recipe
+    DR-->>App: {status: "success", recipe_id: "..."}
 
-    Note over App,DR: Next time: recipe replay — instant, no LLM call
+    Note over App,Sandbox: Data delivery (streaming)
+    App->>DR: GET /data/{recipe_id}
+    DR->>Sandbox: Execute recipe
+    Sandbox-->>App: NDJSON stream (row by row)
+    Sandbox-->>App: {_stream_complete: true, rows_delivered: 12420}
 ```
 
 ## Interfaces

@@ -14,12 +14,16 @@ This guide walks you through integrating datarep into your application, whether 
 │             │ ──────► │                                      │
 │  - thyself  │  or     │  1. Asks user how they access data   │
 │  - resman   │  MCP    │  2. Explores the device              │
-│  - any app  │         │  3. Writes retrieval code            │
-│             │ ◄────── │  4. Returns data (or saves a recipe) │
-└─────────────┘         └──────────────────────────────────────┘
+│  - any app  │         │  3. Reports stats, gets user approval│
+│             │ ◄────── │  4. Writes & validates retrieval code│
+│             │         │  5. Saves a recipe                   │
+│  GET /data/ │ ──────► │                                      │
+│  {recipe_id}│ ◄────── │  6. Streams data directly from sandbox│
+└─────────────┘         │     (NDJSON, no buffering)           │
+                        └──────────────────────────────────────┘
 ```
 
-Your app authenticates with an **API key**, tells datarep what data it wants, and datarep handles everything else — including conversational discovery, browser cookie extraction, sandboxed code execution, and caching working code as "recipes" for instant replay.
+Your app authenticates with an **API key**, tells datarep what data it wants, and datarep handles everything else — including conversational discovery, browser cookie extraction, sandboxed code execution, and caching working code as "recipes." Data is delivered via streaming — your app calls `GET /data/{recipe_id}` and receives NDJSON rows piped directly from the sandbox, with no intermediate storage or memory limits.
 
 ---
 
@@ -122,13 +126,13 @@ The response will be either another `question` (the conversation continues), a `
 
 **What happens under the hood:**
 
-1. The agent checks for an existing recipe for this data type
+1. The agent checks for an existing recipe and validates it against the source
 2. If no recipe exists, it asks the user how they access the data
 3. Based on the answer, it explores the device — scanning browser profiles, app databases, local files
 4. It extracts credentials programmatically (e.g., session cookies from Safari via `browser_cookie3`)
-5. It writes Python retrieval code and executes it in a sandboxed subprocess
-6. If it fails, it reads the error, adapts, and tries again
-7. On success, it validates data quality, saves a recipe with an access strategy, and returns the data
+5. It reports data source stats (record count, date range) and waits for user approval
+6. It writes Python retrieval code, runs a test (~1000 rows) to verify quality, and saves a **recipe**
+7. The consuming app calls `GET /data/{recipe_id}` to stream the full dataset
 
 ### 4c. Incremental sync (`POST /sync`)
 
@@ -147,9 +151,42 @@ curl -X POST http://127.0.0.1:7080/sync \
 The `query` field is optional — if omitted, datarep defaults to a full incremental sync.
 
 
-### 4d. Recipe replay (`POST /recipe/run`)
+### 4d. Streaming data delivery (`GET /data/{recipe_id}`)
 
-Once a recipe exists, you can replay it without any LLM call. This is the fast path — sub-second, deterministic, no API costs:
+Once the agent has created a recipe, your app retrieves the actual data by streaming it:
+
+```bash
+curl http://127.0.0.1:7080/data/instagram_dms_v1 \
+  -H "Authorization: Bearer dr_<key>"
+```
+
+**Response:** A chunked NDJSON stream (`application/x-ndjson`). Each line is a JSON object:
+
+```
+{"conversation_id": "123", "sender": "alice", "text": "hey", ...}
+{"conversation_id": "124", "sender": "bob", "text": "meeting tomorrow?", ...}
+...
+{"_stream_complete": true, "rows_delivered": 40, "rows_failed": 0, "failed_row_ids": []}
+```
+
+The last line is always a `_stream_complete` summary telling your app how many rows were delivered and whether any failed. Data streams directly from the sandbox subprocess to the HTTP response — no intermediate storage, no memory buffering. This works for datasets of any size.
+
+**If rows fail:** Recipes include per-row error handling — a single bad row never kills the stream. Failed rows are skipped and logged. After the stream completes, datarep automatically kicks off its agent to fix the recipe for those edge cases. Your app can then call the retry endpoint.
+
+### 4e. Retrying failed rows (`GET /data/{recipe_id}/retry`)
+
+If the stream summary reported failed rows, wait for datarep to fix the recipe (this happens automatically in the background), then request just the missing rows:
+
+```bash
+curl http://127.0.0.1:7080/data/instagram_dms_v1/retry \
+  -H "Authorization: Bearer dr_<key>"
+```
+
+This runs the (now-fixed) recipe targeting only the previously-failed row IDs. Returns `404` if there are no pending retries. On success, the error record is marked as resolved.
+
+### 4f. Recipe replay (`POST /recipe/run`)
+
+You can also replay a recipe synchronously (returns all output in a single JSON response). This is useful for small datasets but not recommended for large ones — use `GET /data/{recipe_id}` for streaming instead.
 
 ```bash
 curl -X POST http://127.0.0.1:7080/recipe/run \
@@ -158,19 +195,7 @@ curl -X POST http://127.0.0.1:7080/recipe/run \
   -d '{"recipe_id": "instagram_dms_v1"}'
 ```
 
-**Response:**
-
-```json
-{
-  "status": "success",
-  "stdout": "{\"conversation_id\": \"123\", \"sender\": \"alice\", \"text\": \"hey\"}\n",
-  "stderr": "Retrieved 40 messages from 5 conversations\n"
-}
-```
-
-Recipe replay returns raw `stdout`/`stderr` from the Python script. Data is in JSON lines format (one JSON object per line in `stdout`).
-
-**Recommended pattern:** Try recipe replay first. If no recipe exists, fall back to agent-driven retrieval. The agent will create the recipe for you.
+**Recommended pattern:** Use `POST /get` to create the recipe, then `GET /data/{recipe_id}` to stream the data.
 
 ---
 
@@ -432,6 +457,7 @@ Recipes capture a specific access strategy that worked on a specific device. The
 ### Recommended integration pattern
 
 ```python
+import json
 import httpx
 
 DATAREP = "http://127.0.0.1:7080"
@@ -444,39 +470,55 @@ async def get_data(query: str, source: str = None):
         f"{DATAREP}/recipes", params=params, headers=HEADERS
     )
     recipes = resp.json().get("recipes", [])
+    recipe_id = recipes[0]["id"] if recipes else None
 
-    if recipes:
-        # 2. Fast path: replay the recipe
-        result = await httpx.AsyncClient().post(
-            f"{DATAREP}/recipe/run",
-            json={"recipe_id": recipes[0]["id"]},
-            headers=HEADERS,
-            timeout=30,
-        )
-        data = result.json()
-        if data.get("status") == "success":
-            return data["stdout"]
+    if not recipe_id:
+        # 2. No recipe — agent-driven retrieval creates one
+        body = {"query": query}
+        if source:
+            body["source"] = source
 
-    # 3. Slow path: agent-driven retrieval (creates a recipe for next time)
-    body = {"query": query}
-    if source:
-        body["source"] = source
-
-    result = (await httpx.AsyncClient().post(
-        f"{DATAREP}/get", json=body, headers=HEADERS, timeout=120,
-    )).json()
-
-    # 4. Handle conversational flow
-    while result.get("status") == "question":
-        answer = await ask_user(result["question"])
         result = (await httpx.AsyncClient().post(
-            f"{DATAREP}/sessions/{result['session_id']}/reply",
-            json={"answer": answer},
-            headers=HEADERS,
-            timeout=120,
+            f"{DATAREP}/get", json=body, headers=HEADERS, timeout=120,
         )).json()
 
-    return result
+        # Handle conversational flow
+        while result.get("status") == "question":
+            answer = await ask_user(result["question"])
+            result = (await httpx.AsyncClient().post(
+                f"{DATAREP}/sessions/{result['session_id']}/reply",
+                json={"answer": answer},
+                headers=HEADERS,
+                timeout=120,
+            )).json()
+
+        if result.get("status") != "success":
+            return result
+        recipe_id = result.get("recipe_id")
+
+    # 3. Stream the data
+    async with httpx.AsyncClient() as client:
+        async with client.stream(
+            "GET", f"{DATAREP}/data/{recipe_id}", headers=HEADERS, timeout=3600,
+        ) as resp:
+            async for line in resp.aiter_lines():
+                row = json.loads(line)
+                if row.get("_stream_complete"):
+                    summary = row
+                    break
+                yield row  # process each row as it arrives
+
+    # 4. If rows failed, wait for fix and retry
+    if summary.get("rows_failed", 0) > 0:
+        await asyncio.sleep(30)  # wait for agent to fix the recipe
+        async with httpx.AsyncClient() as client:
+            async with client.stream(
+                "GET", f"{DATAREP}/data/{recipe_id}/retry", headers=HEADERS,
+            ) as resp:
+                async for line in resp.aiter_lines():
+                    row = json.loads(line)
+                    if not row.get("_stream_complete"):
+                        yield row
 ```
 
 ---
@@ -535,10 +577,12 @@ The MCP interface does not use API key auth (it runs as a local subprocess, so t
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | `GET` | `/health` | No | Health check. Returns `{"status": "ok"}`. |
-| `POST` | `/get` | Bearer | Agent-driven data retrieval. `source` is optional. |
+| `POST` | `/get` | Bearer | Agent-driven data retrieval. Creates a recipe. `source` is optional. |
 | `POST` | `/sessions/{id}/reply` | Bearer | Reply to an agent question, continuing the session. |
 | `POST` | `/sync` | Bearer | Incremental sync. |
-| `POST` | `/recipe/run` | Bearer | Replay a saved recipe. |
+| `GET` | `/data/{recipe_id}` | Bearer | Stream full dataset as NDJSON. Primary data delivery endpoint. |
+| `GET` | `/data/{recipe_id}/retry` | Bearer | Re-stream only previously-failed rows. Returns `404` if none pending. |
+| `POST` | `/recipe/run` | Bearer | Replay a saved recipe (synchronous, non-streaming). |
 | `GET` | `/sources` | Bearer | List sources (filtered to your app's allow-list). |
 | `POST` | `/sources` | Bearer | Register a new source. |
 | `DELETE` | `/sources/{name}` | Bearer | Remove a source. |
@@ -688,6 +732,7 @@ Each entry includes: timestamp, app ID, action, source, status, and optional det
 2. [ ] Set `ANTHROPIC_API_KEY` in the environment
 3. [ ] `datarep start`
 4. [ ] `datarep app register <your-app>` — save the API key
-5. [ ] Call `POST /get` with your query — datarep handles the rest
+5. [ ] Call `POST /get` with your query — datarep creates a recipe
 6. [ ] Handle `question` responses by relaying to the user and replying with `POST /sessions/{id}/reply`
-7. [ ] On subsequent calls, use `POST /recipe/run` for instant replay
+7. [ ] Stream the data with `GET /data/{recipe_id}`
+8. [ ] Check the `_stream_complete` summary for failures; call `GET /data/{recipe_id}/retry` if needed
