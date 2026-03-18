@@ -1,0 +1,2431 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Your app's data rep — a local agent runtime that retrieves data from any source on demand">
+      
+      
+      
+        <link rel="canonical" href="https://datarep-ai.github.io/datarep-docs/integration-guide/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>Integration Guide - datarep</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#datarep-integration-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="datarep" class="md-header__button md-logo" aria-label="datarep" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            datarep
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Integration Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="indigo"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/datarep-ai/datarep" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="datarep" class="md-nav__button md-logo" aria-label="datarep" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    datarep
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/datarep-ai/datarep" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-get-an-api-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Get an API key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-authenticate-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Authenticate requests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-core-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Core workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Core workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4a-agent-driven-retrieval-post-get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4a. Agent-driven retrieval (POST /get)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4b-replying-to-agent-questions-post-sessionsidreply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Replying to agent questions (POST /sessions/{id}/reply)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4c-incremental-sync-post-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4c. Incremental sync (POST /sync)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4d-streaming-data-delivery-get-datarecipe_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4d. Streaming data delivery (GET /data/{recipe_id})
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4e-retrying-failed-rows-get-datarecipe_idretry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4e. Retrying failed rows (GET /data/{recipe_id}/retry)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4f-recipe-replay-post-reciperun" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4f. Recipe replay (POST /recipe/run)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-conversational-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Conversational flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Conversational flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-cli-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For CLI apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-http-api-consumers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For HTTP API consumers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-agentic-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For agentic apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-managing-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Managing sources
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Managing sources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#register-a-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Register a source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        List sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remove-a-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove a source
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-handling-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Handling credentials
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Handling credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#store-an-api-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store an API key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-an-oauth-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run an OAuth flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-handling-action_required-responses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Handling action_required responses
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Handling action_required responses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-agentic-apps_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For agentic apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-recipes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Recipes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Recipes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-recipes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        List recipes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-recipe-details-including-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get recipe details (including code)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-portability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe portability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-integration-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended integration pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-mcp-interface-for-agentic-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. MCP interface (for agentic apps)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. MCP interface (for agentic apps)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-mcp-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available MCP tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-complete-api-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Complete API reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Complete API reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request-bodies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request bodies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#response-shapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response shapes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-status-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP status codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-sandbox-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Sandbox model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-stored-in-datarep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data stored in ~/.datarep/
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-security-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Security model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-checking-the-audit-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Checking the audit log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick-start checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-get-an-api-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Get an API key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-authenticate-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Authenticate requests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-core-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Core workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Core workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4a-agent-driven-retrieval-post-get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4a. Agent-driven retrieval (POST /get)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4b-replying-to-agent-questions-post-sessionsidreply" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Replying to agent questions (POST /sessions/{id}/reply)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4c-incremental-sync-post-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4c. Incremental sync (POST /sync)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4d-streaming-data-delivery-get-datarecipe_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4d. Streaming data delivery (GET /data/{recipe_id})
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4e-retrying-failed-rows-get-datarecipe_idretry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4e. Retrying failed rows (GET /data/{recipe_id}/retry)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4f-recipe-replay-post-reciperun" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4f. Recipe replay (POST /recipe/run)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-conversational-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Conversational flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Conversational flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-cli-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For CLI apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-http-api-consumers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For HTTP API consumers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-agentic-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For agentic apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-managing-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Managing sources
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Managing sources">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#register-a-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Register a source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        List sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remove-a-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove a source
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-handling-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Handling credentials
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Handling credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#store-an-api-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store an API key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-an-oauth-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run an OAuth flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-handling-action_required-responses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Handling action_required responses
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Handling action_required responses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action types
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-agentic-apps_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For agentic apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-recipes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Recipes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Recipes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#list-recipes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        List recipes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-recipe-details-including-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get recipe details (including code)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipe-portability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recipe portability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-integration-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended integration pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-mcp-interface-for-agentic-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. MCP interface (for agentic apps)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. MCP interface (for agentic apps)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-mcp-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available MCP tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-complete-api-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Complete API reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Complete API reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request-bodies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request bodies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#response-shapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response shapes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-status-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP status codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-sandbox-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Sandbox model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-stored-in-datarep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data stored in ~/.datarep/
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-security-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Security model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-checking-the-audit-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Checking the audit log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick-start checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="datarep-integration-guide">datarep Integration Guide<a class="headerlink" href="#datarep-integration-guide" title="Permanent link">&para;</a></h1>
+<p>datarep is your app's data rep — a local agent runtime that retrieves data from arbitrary sources on your behalf. Your app never writes retrieval code, handles credentials, or executes anything. It tells datarep what data it needs, and datarep's agent figures out how to get it — conversationally discovering access methods, writing extraction code, validating results, and delivering structured data.</p>
+<p>This guide walks you through integrating datarep into your application, whether it's an agentic app like <a href="https://github.com/jfru/thyself">thyself</a>, a backend service, or a CLI tool.</p>
+<hr />
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────┐         ┌──────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  Your App   │  HTTP   │              datarep                 │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│             │ ──────► │                                      │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│  - thyself  │  or     │  1. Asks user how they access data   │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  - resman   │  MCP    │  2. Explores the device              │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  - any app  │         │  3. Reports stats, gets user approval│
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│             │ ◄────── │  4. Writes &amp; validates retrieval code│
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│             │         │  5. Saves a recipe                   │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│  GET /data/ │ ──────► │                                      │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│  {recipe_id}│ ◄────── │  6. Streams data directly from sandbox│
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>└─────────────┘         │     (NDJSON, no buffering)           │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                        └──────────────────────────────────────┘
+</code></pre></div>
+<p>Your app authenticates with an <strong>API key</strong>, tells datarep what data it wants, and datarep handles everything else — including conversational discovery, browser cookie extraction, sandboxed code execution, and caching working code as "recipes." Data is delivered via streaming — your app calls <code>GET /data/{recipe_id}</code> and receives NDJSON rows piped directly from the sandbox, with no intermediate storage or memory limits.</p>
+<hr />
+<h2 id="1-prerequisites">1. Prerequisites<a class="headerlink" href="#1-prerequisites" title="Permanent link">&para;</a></h2>
+<p>datarep must be running on the user's machine. If your app bundles datarep (recommended for desktop apps), manage its lifecycle as a subprocess. If datarep is installed independently, your app discovers it at <code>localhost:7080</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># One-time setup (done by the user or your app&#39;s installer)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span>datarep
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>datarep<span class="w"> </span>init
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>datarep<span class="w"> </span>start
+</code></pre></div>
+<p>The user also needs an <code>ANTHROPIC_API_KEY</code> environment variable set for agent-driven retrieval. Recipe replay works without it.</p>
+<h2 id="2-get-an-api-key">2. Get an API key<a class="headerlink" href="#2-get-an-api-key" title="Permanent link">&para;</a></h2>
+<p>Every consuming app needs its own API key. The user (or your installer) registers your app via the CLI:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Unrestricted access to all sources</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>datarep<span class="w"> </span>app<span class="w"> </span>register<span class="w"> </span>my-app
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Or restricted to specific sources</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>datarep<span class="w"> </span>app<span class="w"> </span>register<span class="w"> </span>my-app<span class="w"> </span>--sources<span class="w"> </span><span class="s2">&quot;gmail,imessage,whatsapp&quot;</span>
+</code></pre></div>
+<p>Output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>App registered: my-app
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  App ID:  app_922df87334ef43e8
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  API Key: dr_wwFzcZCmNBkdDgquwiJzZq9P_Zm9XG0K_hLWzfx9C1U
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  (Save this key — it won&#39;t be shown again.)
+</code></pre></div>
+<p>Store the API key securely in your app (keychain, encrypted config, environment variable — never hardcoded in source). The key is bcrypt-hashed in datarep's database and cannot be retrieved after registration.</p>
+<h2 id="3-authenticate-requests">3. Authenticate requests<a class="headerlink" href="#3-authenticate-requests" title="Permanent link">&para;</a></h2>
+<p>Every request to datarep (except <code>/health</code>) requires a Bearer token:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Authorization: Bearer dr_&lt;your-api-key&gt;
+</code></pre></div>
+<p>Unauthenticated requests return <code>401</code>. Requests to sources outside your app's allow-list return <code>403</code>.</p>
+<hr />
+<h2 id="4-core-workflows">4. Core workflows<a class="headerlink" href="#4-core-workflows" title="Permanent link">&para;</a></h2>
+<h3 id="4a-agent-driven-retrieval-post-get">4a. Agent-driven retrieval (<code>POST /get</code>)<a class="headerlink" href="#4a-agent-driven-retrieval-post-get" title="Permanent link">&para;</a></h3>
+<p>This is the primary way to get data. You describe what you want in natural language; datarep's agent figures out how to get it. The <code>source</code> field is optional — the agent can discover sources on its own.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/get<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="s1">    &quot;query&quot;: &quot;get my Instagram DMs&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="s1">  }&#39;</span>
+</code></pre></div>
+<p><strong>Response</strong> (success):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Retrieved 40 messages from 5 conversations...&quot;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Response</strong> (agent needs user input):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;question&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;session_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;s_abc123def456&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&quot;question&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;How do you usually access your Instagram messages — in a browser, the app, or something else?&quot;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>When the agent needs information from the user (like how they access their data), it returns a <code>question</code> response with a <code>session_id</code>. Your app should relay the question to the user and send their answer back.</p>
+<h3 id="4b-replying-to-agent-questions-post-sessionsidreply">4b. Replying to agent questions (<code>POST /sessions/{id}/reply</code>)<a class="headerlink" href="#4b-replying-to-agent-questions-post-sessionsidreply" title="Permanent link">&para;</a></h3>
+<p>When the agent asks a question, continue the conversation by replying with the user's answer:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/sessions/s_abc123def456/reply<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;answer&quot;: &quot;im logged in via Safari&quot;}&#39;</span>
+</code></pre></div>
+<p>The response will be either another <code>question</code> (the conversation continues), a <code>success</code> (data retrieved), or an <code>error</code>.</p>
+<p><strong>Device-assisted retrieval:</strong> When the agent needs the user to take a physical action (connect a phone, create a backup, mount a USB drive), it sends a <code>question</code> with <code>"monitoring": true</code>. The agent automatically polls for the outcome — the user can reply, but doesn't have to. If the agent detects the action completed programmatically, it continues automatically. If you reply while monitoring is active, you'll receive <code>{"status": "acknowledged"}</code> and the agent incorporates your reply into its workflow.</p>
+<p><strong>What happens under the hood:</strong></p>
+<ol>
+<li>The agent checks for an existing recipe and validates it against the source</li>
+<li>If no recipe exists, it asks the user how they access the data (and follows up to clarify ambiguous answers — e.g. "which browser?")</li>
+<li>Based on the answer, it explores the device — scanning browser profiles, app databases, local files, connected devices, and iPhone backups</li>
+<li>If data is on a physical device (phone, USB drive), it guides the user through connecting/backing up one step at a time, automatically detecting when each step completes</li>
+<li>It extracts credentials programmatically (e.g., session cookies from Safari via <code>browser_cookie3</code>)</li>
+<li>It reports data source stats (record count, date range) and waits for user approval</li>
+<li>It writes Python retrieval code, runs a test (~1000 rows) to verify quality, and saves a <strong>recipe</strong></li>
+<li>The consuming app calls <code>GET /data/{recipe_id}</code> to stream the full dataset</li>
+</ol>
+<h3 id="4c-incremental-sync-post-sync">4c. Incremental sync (<code>POST /sync</code>)<a class="headerlink" href="#4c-incremental-sync-post-sync" title="Permanent link">&para;</a></h3>
+<p>Same as <code>/get</code>, but signals to the agent that it should pick up where the last sync left off (using saved cursors/timestamps):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/sync<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="s1">    &quot;source&quot;: &quot;gmail&quot;,</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="s1">    &quot;query&quot;: &quot;sync new emails since last run&quot;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="s1">  }&#39;</span>
+</code></pre></div>
+<p>The <code>query</code> field is optional — if omitted, datarep defaults to a full incremental sync.</p>
+<h3 id="4d-streaming-data-delivery-get-datarecipe_id">4d. Streaming data delivery (<code>GET /data/{recipe_id}</code>)<a class="headerlink" href="#4d-streaming-data-delivery-get-datarecipe_id" title="Permanent link">&para;</a></h3>
+<p>Once the agent has created a recipe, your app retrieves the actual data by streaming it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>http://127.0.0.1:7080/data/instagram_dms_v1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span>
+</code></pre></div>
+<p><strong>Response:</strong> A chunked NDJSON stream (<code>application/x-ndjson</code>). Each line is a JSON object:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>{&quot;conversation_id&quot;: &quot;123&quot;, &quot;sender&quot;: &quot;alice&quot;, &quot;text&quot;: &quot;hey&quot;, ...}
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>{&quot;conversation_id&quot;: &quot;124&quot;, &quot;sender&quot;: &quot;bob&quot;, &quot;text&quot;: &quot;meeting tomorrow?&quot;, ...}
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>...
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>{&quot;_stream_complete&quot;: true, &quot;rows_delivered&quot;: 40, &quot;rows_failed&quot;: 0, &quot;failed_row_ids&quot;: []}
+</code></pre></div>
+<p>The last line is always a <code>_stream_complete</code> summary telling your app how many rows were delivered and whether any failed. Data streams directly from the sandbox subprocess to the HTTP response — no intermediate storage, no memory buffering. This works for datasets of any size.</p>
+<p><strong>If rows fail:</strong> Recipes include per-row error handling — a single bad row never kills the stream. Failed rows are skipped and logged. After the stream completes, datarep automatically kicks off its agent to fix the recipe for those edge cases. Your app can then call the retry endpoint.</p>
+<h3 id="4e-retrying-failed-rows-get-datarecipe_idretry">4e. Retrying failed rows (<code>GET /data/{recipe_id}/retry</code>)<a class="headerlink" href="#4e-retrying-failed-rows-get-datarecipe_idretry" title="Permanent link">&para;</a></h3>
+<p>If the stream summary reported failed rows, wait for datarep to fix the recipe (this happens automatically in the background), then request just the missing rows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl<span class="w"> </span>http://127.0.0.1:7080/data/instagram_dms_v1/retry<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span>
+</code></pre></div>
+<p>This runs the (now-fixed) recipe targeting only the previously-failed row IDs. Returns <code>404</code> if there are no pending retries. On success, the error record is marked as resolved.</p>
+<h3 id="4f-recipe-replay-post-reciperun">4f. Recipe replay (<code>POST /recipe/run</code>)<a class="headerlink" href="#4f-recipe-replay-post-reciperun" title="Permanent link">&para;</a></h3>
+<p>You can also replay a recipe synchronously (returns all output in a single JSON response). This is useful for small datasets but not recommended for large ones — use <code>GET /data/{recipe_id}</code> for streaming instead.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/recipe/run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;recipe_id&quot;: &quot;instagram_dms_v1&quot;}&#39;</span>
+</code></pre></div>
+<p><strong>Recommended pattern:</strong> Use <code>POST /get</code> to create the recipe, then <code>GET /data/{recipe_id}</code> to stream the data.</p>
+<hr />
+<h2 id="5-conversational-flow">5. Conversational flow<a class="headerlink" href="#5-conversational-flow" title="Permanent link">&para;</a></h2>
+<p>The agent uses a conversational model to discover how to access data. This is the key difference from traditional integration systems — instead of requiring pre-configured sources, the agent asks the user and figures it out.</p>
+<h3 id="for-cli-apps">For CLI apps<a class="headerlink" href="#for-cli-apps" title="Permanent link">&para;</a></h3>
+<p>The CLI handles the conversation loop automatically:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>datarep<span class="w"> </span>get<span class="w"> </span><span class="s2">&quot;i want my Instagram DMs&quot;</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="c1"># Agent: &quot;How do you usually access your Instagram messages — in a browser, the app, or something else?&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># You: &quot;im logged in in browser&quot;</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Agent: [extracts cookies, calls API, returns data]</span>
+</code></pre></div>
+<h3 id="for-http-api-consumers">For HTTP API consumers<a class="headerlink" href="#for-http-api-consumers" title="Permanent link">&para;</a></h3>
+<p>Your app needs to handle the question/reply loop:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">DATAREP</span> <span class="o">=</span> <span class="s2">&quot;http://127.0.0.1:7080&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer dr_&lt;key&gt;&quot;</span><span class="p">}</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">}</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="k">if</span> <span class="n">source</span><span class="p">:</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>        <span class="n">body</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATAREP</span><span class="si">}</span><span class="s2">/get&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>    <span class="p">))</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>    <span class="k">while</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;question&quot;</span><span class="p">:</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>        <span class="c1"># Relay the question to your user and get their answer</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>        <span class="n">answer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ask_user</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">])</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATAREP</span><span class="si">}</span><span class="s2">/sessions/</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;session_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/reply&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>            <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="n">answer</span><span class="p">},</span>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>            <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>            <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>        <span class="p">))</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a>
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div>
+<h3 id="for-agentic-apps">For agentic apps<a class="headerlink" href="#for-agentic-apps" title="Permanent link">&para;</a></h3>
+<p>If your app has an LLM agent, pass the <code>question</code> response directly to your agent as context. Your agent can have a natural conversation with the user and relay answers back to datarep:</p>
+<blockquote>
+<p><strong>User:</strong> "Import my Instagram DMs"</p>
+<p><strong>Your agent</strong> calls datarep, gets a question back</p>
+<p><strong>Your agent:</strong> "datarep wants to know — how do you usually access your Instagram? In a browser, the app, or something else?"</p>
+<p><strong>User:</strong> "Safari"</p>
+<p><strong>Your agent</strong> replies to the datarep session with "Safari"</p>
+<p><strong>datarep agent</strong> extracts Safari cookies, calls API, returns data</p>
+</blockquote>
+<hr />
+<h2 id="6-managing-sources">6. Managing sources<a class="headerlink" href="#6-managing-sources" title="Permanent link">&para;</a></h2>
+<p>Sources are <strong>optional</strong> in the new architecture. The agent can discover and access data without any pre-registered sources. When it successfully retrieves data, it auto-registers a "discovered" source for recipe tracking.</p>
+<p>You can still pre-register sources if you want:</p>
+<h3 id="register-a-source">Register a source<a class="headerlink" href="#register-a-source" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Local SQLite database</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/sources<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="s1">    &quot;name&quot;: &quot;imessage&quot;,</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="s1">    &quot;source_type&quot;: &quot;local_db&quot;,</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="s1">    &quot;config&quot;: {&quot;path&quot;: &quot;~/Library/Messages/chat.db&quot;}</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="s1">  }&#39;</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="c1"># REST API</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/sources<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="s1">    &quot;name&quot;: &quot;square&quot;,</span>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="s1">    &quot;source_type&quot;: &quot;rest_api&quot;,</span>
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="s1">    &quot;config&quot;: {</span>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="s1">      &quot;base_url&quot;: &quot;https://connect.squareup.com/v2&quot;,</span>
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="s1">      &quot;auth_url&quot;: &quot;https://connect.squareup.com/oauth2/authorize&quot;,</span>
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="s1">      &quot;token_url&quot;: &quot;https://connect.squareup.com/oauth2/token&quot;,</span>
+<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="s1">      &quot;client_id&quot;: &quot;sq0idp-...&quot;,</span>
+<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="s1">      &quot;client_secret&quot;: &quot;sq0csp-...&quot;,</span>
+<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a><span class="s1">      &quot;scopes&quot;: [&quot;MERCHANT_PROFILE_READ&quot;, &quot;ORDERS_READ&quot;]</span>
+<a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a><span class="s1">    }</span>
+<a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a><span class="s1">  }&#39;</span>
+<a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a>
+<a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a><span class="c1"># Local files</span>
+<a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/sources<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-32" name="__codelineno-16-32" href="#__codelineno-16-32"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-16-33" name="__codelineno-16-33" href="#__codelineno-16-33"></a><span class="s1">    &quot;name&quot;: &quot;photos&quot;,</span>
+<a id="__codelineno-16-34" name="__codelineno-16-34" href="#__codelineno-16-34"></a><span class="s1">    &quot;source_type&quot;: &quot;local_files&quot;,</span>
+<a id="__codelineno-16-35" name="__codelineno-16-35" href="#__codelineno-16-35"></a><span class="s1">    &quot;config&quot;: {&quot;path&quot;: &quot;~/Pictures&quot;}</span>
+<a id="__codelineno-16-36" name="__codelineno-16-36" href="#__codelineno-16-36"></a><span class="s1">  }&#39;</span>
+</code></pre></div>
+<h3 id="source-types">Source types<a class="headerlink" href="#source-types" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Config</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local_db</code></td>
+<td><code>path</code>: path to SQLite file</td>
+<td>You know the exact DB path upfront</td>
+</tr>
+<tr>
+<td><code>rest_api</code></td>
+<td><code>base_url</code>, plus optional OAuth fields</td>
+<td>You want to pre-configure OAuth credentials</td>
+</tr>
+<tr>
+<td><code>local_files</code></td>
+<td><code>path</code>: directory path</td>
+<td>You want to restrict the agent to a specific directory</td>
+</tr>
+<tr>
+<td><code>discovered</code></td>
+<td>Auto-created by agent</td>
+<td>Agent found the data without a pre-registered source</td>
+</tr>
+</tbody>
+</table>
+<h3 id="list-sources">List sources<a class="headerlink" href="#list-sources" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl<span class="w"> </span>http://127.0.0.1:7080/sources<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span>
+</code></pre></div>
+<h3 id="remove-a-source">Remove a source<a class="headerlink" href="#remove-a-source" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span>http://127.0.0.1:7080/sources/imessage<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span>
+</code></pre></div>
+<hr />
+<h2 id="7-handling-credentials">7. Handling credentials<a class="headerlink" href="#7-handling-credentials" title="Permanent link">&para;</a></h2>
+<p>The agent can often extract credentials on its own — particularly browser session cookies. For sources where this isn't possible, you have two options:</p>
+<h3 id="store-an-api-key">Store an API key<a class="headerlink" href="#store-an-api-key" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/auth/credentials<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="s1">    &quot;source&quot;: &quot;openai&quot;,</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="s1">    &quot;cred_type&quot;: &quot;api_key&quot;,</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="s1">    &quot;data&quot;: {&quot;api_key&quot;: &quot;sk-...&quot;}</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="s1">  }&#39;</span>
+</code></pre></div>
+<h3 id="run-an-oauth-flow">Run an OAuth flow<a class="headerlink" href="#run-an-oauth-flow" title="Permanent link">&para;</a></h3>
+<p>If the source config includes <code>auth_url</code>, <code>token_url</code>, <code>client_id</code>, and <code>client_secret</code>, you can trigger a browser-based OAuth flow:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://127.0.0.1:7080/auth/oauth<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;source&quot;: &quot;square&quot;}&#39;</span>
+</code></pre></div>
+<p>This opens the user's browser to the provider's consent screen, runs a local redirect server to capture the authorization code, exchanges it for tokens, and stores them encrypted. Token refresh is automatic.</p>
+<hr />
+<h2 id="8-handling-action_required-responses">8. Handling <code>action_required</code> responses<a class="headerlink" href="#8-handling-action_required-responses" title="Permanent link">&para;</a></h2>
+<p>When datarep needs something from the user — a permission grant, an OAuth login, a missing API key — it returns a structured <code>action_required</code> response instead of failing silently. <strong>Your app is responsible for relaying this to the user.</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;action_required&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nt">&quot;action_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;os_permission&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;imessage&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="nt">&quot;explanation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Cannot read the iMessage database. macOS Full Disk Access is required.&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="nt">&quot;steps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="s2">&quot;Open System Preferences &gt; Privacy &amp; Security &gt; Full Disk Access&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">    </span><span class="s2">&quot;Enable access for the application&quot;</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">  </span><span class="nt">&quot;deep_link&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">  </span><span class="nt">&quot;retryable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">  </span><span class="nt">&quot;context&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="w">    </span><span class="nt">&quot;attempted_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/Users/you/Library/Messages/chat.db&quot;</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="action-types">Action types<a class="headerlink" href="#action-types" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th><code>action_type</code></th>
+<th>Meaning</th>
+<th>What your app should do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>os_permission</code></td>
+<td>macOS permission needed (Full Disk Access, etc.)</td>
+<td>Guide the user to System Preferences. Use <code>deep_link</code> if provided. Retry after.</td>
+</tr>
+<tr>
+<td><code>oauth_login</code></td>
+<td>OAuth sign-in required</td>
+<td>Call <code>POST /auth/oauth</code> with the source name, which opens the browser. Retry after.</td>
+</tr>
+<tr>
+<td><code>api_key_needed</code></td>
+<td>API key required for a source</td>
+<td>Prompt the user for a key, then <code>POST /auth/credentials</code>. Retry after.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="for-agentic-apps_1">For agentic apps<a class="headerlink" href="#for-agentic-apps_1" title="Permanent link">&para;</a></h3>
+<p>If your app has an LLM agent, pass the full <code>action_required</code> response to your agent as context. The fields are designed to be LLM-friendly — your agent can read <code>explanation</code>, <code>steps</code>, and <code>context</code> and have a natural conversation with the user about what's needed:</p>
+<blockquote>
+<p><strong>User:</strong> "Import my iMessages"</p>
+<p><strong>Your agent:</strong> "I need Full Disk Access to read your iMessage database. You can enable it in System Preferences under Privacy &amp; Security. Want me to open that for you?"</p>
+</blockquote>
+<p>After the user completes the action, retry the original request. All <code>action_required</code> responses have <code>"retryable": true</code>.</p>
+<hr />
+<h2 id="9-recipes">9. Recipes<a class="headerlink" href="#9-recipes" title="Permanent link">&para;</a></h2>
+<p>Recipes are datarep's caching layer. When the agent successfully retrieves data, it saves the working Python code as a recipe along with an <strong>access strategy</strong> that describes how the data is accessed (e.g., "Safari cookies + Instagram web API"). Recipes can be replayed instantly without an LLM call.</p>
+<h3 id="list-recipes">List recipes<a class="headerlink" href="#list-recipes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>curl<span class="w"> </span>http://127.0.0.1:7080/recipes<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># Filter by source</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>curl<span class="w"> </span><span class="s2">&quot;http://127.0.0.1:7080/recipes?source=instagram&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span>
+</code></pre></div>
+<p><strong>Response:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">{</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nt">&quot;recipes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;instagram_dms_v1&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">      </span><span class="nt">&quot;source_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;instagram&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Retrieves Instagram DMs via browser cookies and web API&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">      </span><span class="nt">&quot;access_strategy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Extract Safari session cookies, call Instagram private API with rate limiting&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">      </span><span class="nt">&quot;last_used_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-03-16T15:34:00+00:00&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">      </span><span class="nt">&quot;times_used&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="w">      </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-03-16T15:22:00+00:00&quot;</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="get-recipe-details-including-code">Get recipe details (including code)<a class="headerlink" href="#get-recipe-details-including-code" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>curl<span class="w"> </span>http://127.0.0.1:7080/recipes/instagram_dms_v1<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer dr_&lt;key&gt;&quot;</span>
+</code></pre></div>
+<h3 id="recipe-portability">Recipe portability<a class="headerlink" href="#recipe-portability" title="Permanent link">&para;</a></h3>
+<p>Recipes capture a specific access strategy that worked on a specific device. They may not be universally portable — a recipe that extracts Safari cookies won't work on a machine where the user uses Chrome. The agent handles this gracefully: if a recipe fails, it diagnoses the issue and adapts rather than rewriting from scratch.</p>
+<h3 id="recommended-integration-pattern">Recommended integration pattern<a class="headerlink" href="#recommended-integration-pattern" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">DATAREP</span> <span class="o">=</span> <span class="s2">&quot;http://127.0.0.1:7080&quot;</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer dr_&lt;key&gt;&quot;</span><span class="p">}</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>    <span class="c1"># 1. Check for an existing recipe</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">source</span><span class="p">}</span> <span class="k">if</span> <span class="n">source</span> <span class="k">else</span> <span class="p">{}</span>
+<a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a>    <span class="n">resp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATAREP</span><span class="si">}</span><span class="s2">/recipes&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span>
+<a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>    <span class="p">)</span>
+<a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a>    <span class="n">recipes</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipes&quot;</span><span class="p">,</span> <span class="p">[])</span>
+<a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a>    <span class="n">recipe_id</span> <span class="o">=</span> <span class="n">recipes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">recipes</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>
+<a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">recipe_id</span><span class="p">:</span>
+<a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>        <span class="c1"># 2. No recipe — agent-driven retrieval creates one</span>
+<a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a>        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span><span class="p">}</span>
+<a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a>        <span class="k">if</span> <span class="n">source</span><span class="p">:</span>
+<a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a>            <span class="n">body</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span>
+<a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a>
+<a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a>        <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+<a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATAREP</span><span class="si">}</span><span class="s2">/get&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+<a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a>        <span class="p">))</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>
+<a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a>        <span class="c1"># Handle conversational flow</span>
+<a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a>        <span class="k">while</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;question&quot;</span><span class="p">:</span>
+<a id="__codelineno-25-28" name="__codelineno-25-28" href="#__codelineno-25-28"></a>            <span class="n">answer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ask_user</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;question&quot;</span><span class="p">])</span>
+<a id="__codelineno-25-29" name="__codelineno-25-29" href="#__codelineno-25-29"></a>            <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+<a id="__codelineno-25-30" name="__codelineno-25-30" href="#__codelineno-25-30"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATAREP</span><span class="si">}</span><span class="s2">/sessions/</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;session_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/reply&quot;</span><span class="p">,</span>
+<a id="__codelineno-25-31" name="__codelineno-25-31" href="#__codelineno-25-31"></a>                <span class="n">json</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;answer&quot;</span><span class="p">:</span> <span class="n">answer</span><span class="p">},</span>
+<a id="__codelineno-25-32" name="__codelineno-25-32" href="#__codelineno-25-32"></a>                <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span>
+<a id="__codelineno-25-33" name="__codelineno-25-33" href="#__codelineno-25-33"></a>                <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+<a id="__codelineno-25-34" name="__codelineno-25-34" href="#__codelineno-25-34"></a>            <span class="p">))</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<a id="__codelineno-25-35" name="__codelineno-25-35" href="#__codelineno-25-35"></a>
+<a id="__codelineno-25-36" name="__codelineno-25-36" href="#__codelineno-25-36"></a>        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span>
+<a id="__codelineno-25-37" name="__codelineno-25-37" href="#__codelineno-25-37"></a>            <span class="k">return</span> <span class="n">result</span>
+<a id="__codelineno-25-38" name="__codelineno-25-38" href="#__codelineno-25-38"></a>        <span class="n">recipe_id</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;recipe_id&quot;</span><span class="p">)</span>
+<a id="__codelineno-25-39" name="__codelineno-25-39" href="#__codelineno-25-39"></a>
+<a id="__codelineno-25-40" name="__codelineno-25-40" href="#__codelineno-25-40"></a>    <span class="c1"># 3. Stream the data</span>
+<a id="__codelineno-25-41" name="__codelineno-25-41" href="#__codelineno-25-41"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-25-42" name="__codelineno-25-42" href="#__codelineno-25-42"></a>        <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+<a id="__codelineno-25-43" name="__codelineno-25-43" href="#__codelineno-25-43"></a>            <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATAREP</span><span class="si">}</span><span class="s2">/data/</span><span class="si">{</span><span class="n">recipe_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+<a id="__codelineno-25-44" name="__codelineno-25-44" href="#__codelineno-25-44"></a>        <span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+<a id="__codelineno-25-45" name="__codelineno-25-45" href="#__codelineno-25-45"></a>            <span class="k">async</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">aiter_lines</span><span class="p">():</span>
+<a id="__codelineno-25-46" name="__codelineno-25-46" href="#__codelineno-25-46"></a>                <span class="n">row</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<a id="__codelineno-25-47" name="__codelineno-25-47" href="#__codelineno-25-47"></a>                <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_stream_complete&quot;</span><span class="p">):</span>
+<a id="__codelineno-25-48" name="__codelineno-25-48" href="#__codelineno-25-48"></a>                    <span class="n">summary</span> <span class="o">=</span> <span class="n">row</span>
+<a id="__codelineno-25-49" name="__codelineno-25-49" href="#__codelineno-25-49"></a>                    <span class="k">break</span>
+<a id="__codelineno-25-50" name="__codelineno-25-50" href="#__codelineno-25-50"></a>                <span class="k">yield</span> <span class="n">row</span>  <span class="c1"># process each row as it arrives</span>
+<a id="__codelineno-25-51" name="__codelineno-25-51" href="#__codelineno-25-51"></a>
+<a id="__codelineno-25-52" name="__codelineno-25-52" href="#__codelineno-25-52"></a>    <span class="c1"># 4. If rows failed, wait for fix and retry</span>
+<a id="__codelineno-25-53" name="__codelineno-25-53" href="#__codelineno-25-53"></a>    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rows_failed&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-25-54" name="__codelineno-25-54" href="#__codelineno-25-54"></a>        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># wait for agent to fix the recipe</span>
+<a id="__codelineno-25-55" name="__codelineno-25-55" href="#__codelineno-25-55"></a>        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<a id="__codelineno-25-56" name="__codelineno-25-56" href="#__codelineno-25-56"></a>            <span class="k">async</span> <span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span>
+<a id="__codelineno-25-57" name="__codelineno-25-57" href="#__codelineno-25-57"></a>                <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DATAREP</span><span class="si">}</span><span class="s2">/data/</span><span class="si">{</span><span class="n">recipe_id</span><span class="si">}</span><span class="s2">/retry&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">HEADERS</span><span class="p">,</span>
+<a id="__codelineno-25-58" name="__codelineno-25-58" href="#__codelineno-25-58"></a>            <span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>
+<a id="__codelineno-25-59" name="__codelineno-25-59" href="#__codelineno-25-59"></a>                <span class="k">async</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">aiter_lines</span><span class="p">():</span>
+<a id="__codelineno-25-60" name="__codelineno-25-60" href="#__codelineno-25-60"></a>                    <span class="n">row</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<a id="__codelineno-25-61" name="__codelineno-25-61" href="#__codelineno-25-61"></a>                    <span class="k">if</span> <span class="ow">not</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_stream_complete&quot;</span><span class="p">):</span>
+<a id="__codelineno-25-62" name="__codelineno-25-62" href="#__codelineno-25-62"></a>                        <span class="k">yield</span> <span class="n">row</span>
+</code></pre></div>
+<hr />
+<h2 id="10-mcp-interface-for-agentic-apps">10. MCP interface (for agentic apps)<a class="headerlink" href="#10-mcp-interface-for-agentic-apps" title="Permanent link">&para;</a></h2>
+<p>If your app uses the Model Context Protocol, datarep exposes itself as an MCP server. This is the most natural integration for LLM-powered apps — your agent discovers datarep's tools and uses them directly.</p>
+<h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
+<p>Add datarep to your MCP config (e.g., in Cursor, Claude Desktop, or your app's MCP settings):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">{</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="nt">&quot;mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">    </span><span class="nt">&quot;datarep&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;datarep.mcp_server&quot;</span><span class="p">],</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">      </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">        </span><span class="nt">&quot;ANTHROPIC_API_KEY&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;key-or-jwt&gt;&quot;</span><span class="p">,</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">        </span><span class="nt">&quot;ANTHROPIC_BASE_URL&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://your-proxy.example.com&quot;</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="available-mcp-tools">Available MCP tools<a class="headerlink" href="#available-mcp-tools" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>datarep_get(query, source?)</code></td>
+<td>Agent-driven retrieval. Source is optional. May return a question.</td>
+</tr>
+<tr>
+<td><code>datarep_reply(session_id, answer)</code></td>
+<td>Reply to an agent question to continue a retrieval session.</td>
+</tr>
+<tr>
+<td><code>datarep_sync(source, query?)</code></td>
+<td>Incremental sync</td>
+</tr>
+<tr>
+<td><code>datarep_list_sources()</code></td>
+<td>List registered sources</td>
+</tr>
+<tr>
+<td><code>datarep_run_recipe(recipe_id)</code></td>
+<td>Replay a saved recipe</td>
+</tr>
+<tr>
+<td><code>datarep_list_recipes(source?)</code></td>
+<td>List saved recipes</td>
+</tr>
+<tr>
+<td><code>datarep_initiate_oauth(source)</code></td>
+<td>Start an OAuth flow</td>
+</tr>
+<tr>
+<td><code>datarep_check_permission(source)</code></td>
+<td>Check if a source is accessible</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mcp-resources">MCP resources<a class="headerlink" href="#mcp-resources" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>URI</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>datarep://sources</code></td>
+<td>List of registered sources</td>
+</tr>
+<tr>
+<td><code>datarep://recipes</code></td>
+<td>List of saved recipes</td>
+</tr>
+</tbody>
+</table>
+<p>The MCP interface does not use API key auth (it runs as a local subprocess, so trust is inherited from the process owner). Use the HTTP API if you need per-app access control.</p>
+<hr />
+<h2 id="11-complete-api-reference">11. Complete API reference<a class="headerlink" href="#11-complete-api-reference" title="Permanent link">&para;</a></h2>
+<h3 id="endpoints">Endpoints<a class="headerlink" href="#endpoints" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/health</code></td>
+<td>No</td>
+<td>Health check. Returns <code>{"status": "ok"}</code>.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/get</code></td>
+<td>Bearer</td>
+<td>Agent-driven data retrieval. Creates a recipe. <code>source</code> is optional.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/sessions/{id}/reply</code></td>
+<td>Bearer</td>
+<td>Reply to an agent question, continuing the session.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/sync</code></td>
+<td>Bearer</td>
+<td>Incremental sync.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/data/{recipe_id}</code></td>
+<td>Bearer</td>
+<td>Stream full dataset as NDJSON. Primary data delivery endpoint.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/data/{recipe_id}/retry</code></td>
+<td>Bearer</td>
+<td>Re-stream only previously-failed rows. Returns <code>404</code> if none pending.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/recipe/run</code></td>
+<td>Bearer</td>
+<td>Replay a saved recipe (synchronous, non-streaming).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/sources</code></td>
+<td>Bearer</td>
+<td>List sources (filtered to your app's allow-list).</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/sources</code></td>
+<td>Bearer</td>
+<td>Register a new source.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/sources/{name}</code></td>
+<td>Bearer</td>
+<td>Remove a source.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/auth/credentials</code></td>
+<td>Bearer</td>
+<td>Store credentials for a source.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/auth/oauth</code></td>
+<td>Bearer</td>
+<td>Initiate an OAuth flow.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/recipes</code></td>
+<td>Bearer</td>
+<td>List recipes. Optional <code>?source=</code> filter.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/recipes/{id}</code></td>
+<td>Bearer</td>
+<td>Get recipe details and code.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/webhooks/{source}</code></td>
+<td>No</td>
+<td>Webhook receiver (for push-based sources).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="request-bodies">Request bodies<a class="headerlink" href="#request-bodies" title="Permanent link">&para;</a></h3>
+<p><strong><code>POST /get</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="p">{</span><span class="nt">&quot;query&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string (optional)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;stream&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong><code>POST /sessions/{id}/reply</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span><span class="nt">&quot;answer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;stream&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong><code>POST /sync</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="p">{</span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;query&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string (optional)&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong><code>POST /recipe/run</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span><span class="nt">&quot;recipe_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong><code>POST /sources</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;source_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;local_db|rest_api|local_files&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}}</span>
+</code></pre></div></p>
+<p><strong><code>POST /auth/credentials</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">{</span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;cred_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;api_key|oauth2|custom&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="nt">&quot;expires_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ISO8601 (optional)&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong><code>POST /auth/oauth</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">{</span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="response-shapes">Response shapes<a class="headerlink" href="#response-shapes" title="Permanent link">&para;</a></h3>
+<p>All responses return JSON. The three primary response types are:</p>
+<p><strong>Success:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;result&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Question (agent needs user input):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;question&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;session_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;s_abc123&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;question&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;How do you...?&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Error:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;traceback&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">}</span>
+</code></pre></div></p>
+<h3 id="http-status-codes">HTTP status codes<a class="headerlink" href="#http-status-codes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>Success</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Bad request (invalid source type, missing config, etc.)</td>
+</tr>
+<tr>
+<td>401</td>
+<td>Missing or invalid API key</td>
+</tr>
+<tr>
+<td>403</td>
+<td>App does not have access to the requested source</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Source or recipe not found</td>
+</tr>
+<tr>
+<td>503</td>
+<td>Agent not available (missing <code>ANTHROPIC_API_KEY</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="12-sandbox-model">12. Sandbox model<a class="headerlink" href="#12-sandbox-model" title="Permanent link">&para;</a></h2>
+<p>The agent's code runs in a macOS <code>sandbox-exec</code> environment with:</p>
+<ul>
+<li><strong>Full read-only filesystem access</strong> — the agent can read any file on the device (browser profiles, app databases, local files)</li>
+<li><strong>Open network access</strong> — outbound TCP and UDP (including DNS resolution)</li>
+<li><strong>Write-restricted</strong> — writes only allowed to the temporary working directory</li>
+<li><strong>No inbound connections</strong> — the sandbox cannot listen for incoming traffic</li>
+</ul>
+<p>The sandbox is designed for trust: the user runs datarep on their own machine and controls what data gets retrieved. The agent is instructed to never ask the user to manually extract data it can get programmatically. The two exceptions are authentication (asking the user to log into a service) and device-assisted retrieval (guiding the user through physical actions like connecting a phone or creating a backup).</p>
+<hr />
+<h2 id="13-configuration">13. Configuration<a class="headerlink" href="#13-configuration" title="Permanent link">&para;</a></h2>
+<p>datarep is configured via environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Purpose</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DATAREP_HOME</code></td>
+<td>Data directory</td>
+<td><code>~/.datarep</code></td>
+</tr>
+<tr>
+<td><code>DATAREP_PORT</code></td>
+<td>HTTP server port</td>
+<td><code>7080</code></td>
+</tr>
+<tr>
+<td><code>DATAREP_HOST</code></td>
+<td>Server bind address</td>
+<td><code>127.0.0.1</code></td>
+</tr>
+<tr>
+<td><code>ANTHROPIC_API_KEY</code></td>
+<td>Powers the retrieval agent (or JWT when proxied)</td>
+<td>Required for <code>/get</code> and <code>/sync</code></td>
+</tr>
+<tr>
+<td><code>ANTHROPIC_BASE_URL</code></td>
+<td>Custom base URL for Anthropic API (proxy support)</td>
+<td><code>https://api.anthropic.com</code></td>
+</tr>
+<tr>
+<td><code>DATAREP_MODEL</code></td>
+<td>Claude model to use</td>
+<td><code>claude-opus-4-6</code></td>
+</tr>
+<tr>
+<td><code>DATAREP_KEY</code></td>
+<td>Fernet key for credential encryption</td>
+<td>Auto-generated</td>
+</tr>
+</tbody>
+</table>
+<h3 id="data-stored-in-datarep">Data stored in <code>~/.datarep/</code><a class="headerlink" href="#data-stored-in-datarep" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>datarep.db</code></td>
+<td>SQLite database (sources, credentials, recipes, apps, audit log)</td>
+</tr>
+<tr>
+<td><code>master.key</code></td>
+<td>Fernet encryption key for credentials (mode <code>0600</code>)</td>
+</tr>
+<tr>
+<td><code>recipes/</code></td>
+<td>Saved recipe <code>.py</code> files</td>
+</tr>
+<tr>
+<td><code>logs/</code></td>
+<td>Per-request agent JSONL log files</td>
+</tr>
+<tr>
+<td><code>datarep.pid</code></td>
+<td>Server PID when running as daemon</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="14-security-model">14. Security model<a class="headerlink" href="#14-security-model" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Credentials are encrypted at rest</strong> using Fernet symmetric encryption. The master key is stored with <code>0600</code> permissions.</li>
+<li><strong>API keys are bcrypt-hashed</strong> — datarep never stores your app's key in plaintext.</li>
+<li><strong>Code execution is sandboxed</strong> — on macOS, datarep uses <code>sandbox-exec</code> to restrict filesystem writes and enforce read-only access to the rest of the system.</li>
+<li><strong>Per-app source restrictions</strong> — each app can be limited to specific sources at registration time.</li>
+<li><strong>Full audit log</strong> — every action (retrieval, sync, source changes, auth events) is logged with app ID, timestamp, and status.</li>
+<li><strong>Agent never delegates to user</strong> — the agent extracts credentials programmatically rather than asking users to paste tokens or cookies. The only exceptions are authentication (logging into a service) and device-assisted retrieval (connecting a phone, creating a backup), where the agent guides the user one step at a time and automatically monitors for completion.</li>
+</ul>
+<hr />
+<h2 id="15-checking-the-audit-log">15. Checking the audit log<a class="headerlink" href="#15-checking-the-audit-log" title="Permanent link">&para;</a></h2>
+<p>For debugging or monitoring, query the audit log:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="c1"># Via CLI</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>datarep<span class="w"> </span>logs
+<a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>datarep<span class="w"> </span>logs<span class="w"> </span>--source<span class="w"> </span>imessage
+<a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a>datarep<span class="w"> </span>logs<span class="w"> </span>--app-id<span class="w"> </span>app_922df87334ef43e8<span class="w"> </span>--limit<span class="w"> </span><span class="m">10</span>
+</code></pre></div>
+<p>Each entry includes: timestamp, app ID, action, source, status, and optional details.</p>
+<hr />
+<h2 id="quick-start-checklist">Quick-start checklist<a class="headerlink" href="#quick-start-checklist" title="Permanent link">&para;</a></h2>
+<ol>
+<li>[ ] <code>pip install datarep &amp;&amp; datarep init</code></li>
+<li>[ ] Set <code>ANTHROPIC_API_KEY</code> in the environment</li>
+<li>[ ] <code>datarep start</code></li>
+<li>[ ] <code>datarep app register &lt;your-app&gt;</code> — save the API key</li>
+<li>[ ] Call <code>POST /get</code> with your query — datarep creates a recipe</li>
+<li>[ ] Handle <code>question</code> responses by relaying to the user and replying with <code>POST /sessions/{id}/reply</code></li>
+<li>[ ] Stream the data with <code>GET /data/{recipe_id}</code></li>
+<li>[ ] Check the <code>_stream_complete</code> summary for failures; call <code>GET /data/{recipe_id}/retry</code> if needed</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Home
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/datarep-ai" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "navigation.sections", "navigation.top", "navigation.footer", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
