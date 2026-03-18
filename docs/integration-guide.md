@@ -124,15 +124,18 @@ curl -X POST http://127.0.0.1:7080/sessions/s_abc123def456/reply \
 
 The response will be either another `question` (the conversation continues), a `success` (data retrieved), or an `error`.
 
+**Device-assisted retrieval:** When the agent needs the user to take a physical action (connect a phone, create a backup, mount a USB drive), it sends a `question` with `"monitoring": true`. The agent automatically polls for the outcome — the user can reply, but doesn't have to. If the agent detects the action completed programmatically, it continues automatically. If you reply while monitoring is active, you'll receive `{"status": "acknowledged"}` and the agent incorporates your reply into its workflow.
+
 **What happens under the hood:**
 
 1. The agent checks for an existing recipe and validates it against the source
-2. If no recipe exists, it asks the user how they access the data
-3. Based on the answer, it explores the device — scanning browser profiles, app databases, local files
-4. It extracts credentials programmatically (e.g., session cookies from Safari via `browser_cookie3`)
-5. It reports data source stats (record count, date range) and waits for user approval
-6. It writes Python retrieval code, runs a test (~1000 rows) to verify quality, and saves a **recipe**
-7. The consuming app calls `GET /data/{recipe_id}` to stream the full dataset
+2. If no recipe exists, it asks the user how they access the data (and follows up to clarify ambiguous answers — e.g. "which browser?")
+3. Based on the answer, it explores the device — scanning browser profiles, app databases, local files, connected devices, and iPhone backups
+4. If data is on a physical device (phone, USB drive), it guides the user through connecting/backing up one step at a time, automatically detecting when each step completes
+5. It extracts credentials programmatically (e.g., session cookies from Safari via `browser_cookie3`)
+6. It reports data source stats (record count, date range) and waits for user approval
+7. It writes Python retrieval code, runs a test (~1000 rows) to verify quality, and saves a **recipe**
+8. The consuming app calls `GET /data/{recipe_id}` to stream the full dataset
 
 ### 4c. Incremental sync (`POST /sync`)
 
@@ -670,7 +673,7 @@ The agent's code runs in a macOS `sandbox-exec` environment with:
 - **Write-restricted** — writes only allowed to the temporary working directory
 - **No inbound connections** — the sandbox cannot listen for incoming traffic
 
-The sandbox is designed for trust: the user runs datarep on their own machine and controls what data gets retrieved. The agent is instructed to never ask the user to manually extract data it can get programmatically.
+The sandbox is designed for trust: the user runs datarep on their own machine and controls what data gets retrieved. The agent is instructed to never ask the user to manually extract data it can get programmatically. The two exceptions are authentication (asking the user to log into a service) and device-assisted retrieval (guiding the user through physical actions like connecting a phone or creating a backup).
 
 ---
 
@@ -685,7 +688,7 @@ datarep is configured via environment variables:
 | `DATAREP_HOST` | Server bind address | `127.0.0.1` |
 | `ANTHROPIC_API_KEY` | Powers the retrieval agent (or JWT when proxied) | Required for `/get` and `/sync` |
 | `ANTHROPIC_BASE_URL` | Custom base URL for Anthropic API (proxy support) | `https://api.anthropic.com` |
-| `DATAREP_MODEL` | Claude model to use | `claude-sonnet-4-20250514` |
+| `DATAREP_MODEL` | Claude model to use | `claude-opus-4-6` |
 | `DATAREP_KEY` | Fernet key for credential encryption | Auto-generated |
 
 ### Data stored in `~/.datarep/`
@@ -707,7 +710,7 @@ datarep is configured via environment variables:
 - **Code execution is sandboxed** — on macOS, datarep uses `sandbox-exec` to restrict filesystem writes and enforce read-only access to the rest of the system.
 - **Per-app source restrictions** — each app can be limited to specific sources at registration time.
 - **Full audit log** — every action (retrieval, sync, source changes, auth events) is logged with app ID, timestamp, and status.
-- **Agent never delegates to user** — the agent extracts credentials programmatically rather than asking users to paste tokens or cookies.
+- **Agent never delegates to user** — the agent extracts credentials programmatically rather than asking users to paste tokens or cookies. The only exceptions are authentication (logging into a service) and device-assisted retrieval (connecting a phone, creating a backup), where the agent guides the user one step at a time and automatically monitors for completion.
 
 ---
 

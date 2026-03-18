@@ -64,7 +64,7 @@ curl -X POST http://127.0.0.1:7080/get \
   -d '{"query": "get my recent iMessages"}'
 ```
 
-datarep's agent asks the user how they access the data, explores the device, writes retrieval code, executes it, returns data, and saves a **recipe** — a cached version of the working code — so subsequent requests are instant.
+datarep's agent asks the user how they access the data, explores the device (including connected phones and USB drives), writes retrieval code, executes it, returns data, and saves a **recipe** — a cached version of the working code — so subsequent requests are instant.
 
 ## How it works
 
@@ -79,8 +79,12 @@ sequenceDiagram
     App->>DR: POST /get {query}
     DR->>Agent: Start retrieval
     Agent->>User: "How do you access this data?"
-    User-->>Agent: "I'm logged in via Safari"
-    Agent->>Sandbox: Explore source, run stats
+    User-->>Agent: "On my phone"
+    Agent->>User: "Which phone — iPhone or Android?"
+    User-->>Agent: "iPhone"
+    Agent->>User: "Please connect your iPhone via USB"
+    Note over Agent: Automatically detects connection
+    Agent->>Sandbox: Explore backup, run stats
     Sandbox-->>Agent: 12,420 records found
     Agent->>User: "Found 12,420 records. Proceed?"
     User-->>Agent: "Yes"
